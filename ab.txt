@@ -1,0 +1,13 @@
+SELECT departments.department_name
+  FROM emp_details 
+     INNER JOIN departments
+       ON department_id =emp_dept
+        GROUP by departments.department_name
+          HAVING COUNT(*) = 3;
+
+SELECT dpt_name
+FROM emp_details 
+INNER JOIN emp_department
+ON emp_dept =dpt_code
+GROUP BY dpt_name
+HAVING COUNT(*) =3;
