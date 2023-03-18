@@ -1,0 +1,12 @@
+--> To list all the user defined datatypes....
+
+describe types;
+
+
+
+CREATE TYPE player_details (age int, country text,  runScored int );
+
+Create table player_info (name text primary key, details  FROZEN<player_details>);
+
+insert into player_info (name , details) values ('Uvraj' , {age: 34, country: 'India' , runScored: 2340 });
+
