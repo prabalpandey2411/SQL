@@ -1,0 +1,125 @@
+
+
+Restting the value
+
+num <0 -- 0
+num>100 -- 100
+
+create table trg (num int(10));
+
+BEFORE
+------------
+
+Delimiter /
+
+CREATE TRIGGER chknum BEFORE INSERT ON trg 
+FOR EACH ROW
+
+Begin
+
+	IF NEW.num < 0 THEN SET NEW.num = 0;
+	ELSEIF NEW.num > 100 THEN SET NEW.num = 100;
+	END IF;
+END /
+
+Delimiter ;
+-----------------------------------------------------------------------------------------------------------
+CREATE TABLE empBackup
+(
+	empid varchar(10),
+	empname varchar(10),
+	updateDate timestamp
+);
+
+Delimiter //
+
+CREATE TRIGGER empbk BEFORE UPDATE on employee
+FOR EACH ROW
+BEGIN
+
+	insert into empbackup set empid = OLD.employeeid, empname = OLD.efname,
+	updatedate = current_timestamp; 
+End //
+
+Delimiter ;
+----------------------------------------------------------------------------------------------------------------------------
+Delimiter /
+CREATE PROCEDURE chkyr (IN yrr int(10))
+BEGIN
+	IF yrr < 1900 THEN SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = ' Sorry, year of joining can not be less than 1900';
+	END IF;
+	
+	IF yrr > 2022 THEN SIGNAL SQLSTATE '45001'
+		SET MESSAGE_TEXT = ' Sorry, year of joining can not future year';
+	END IF;
+
+END /
+
+Delimiter ;
+
+--> Related Trigger
+
+Delimiter /
+
+CREATE TRIGGER checkBeforeMemberUpdate BEFORE INSERT ON member
+FOR EACH ROW
+BEGIN
+	CALL chkyr(year(NEW.DOJ)) ;	
+END /
+Delimiter ;
+
+
+insert into member values ('M014','Nauka','Menon','P001','1867-12-25','Female','Active');
+
+---------------------
+Delimiter /
+CREATE TRIGGER checkBeforeMbrUpdate BEFORE UPDATE ON member
+FOR EACH ROW
+BEGIN
+	CALL chkyr(year(NEW.DOJ)) ;	
+END /
+Delimiter ;
+
+update member set doj = '2050-01-01' where memberid = 'M012';
+
+---------------------------------------------------------------------------------------------
+
+CREATE TABLE membackup (mid varchar(10), mfname varchar(10) , mlname varchar(10));
+
+After Trigger
+----------------
+Delimiter /
+CREATE TRIGGER memberbackup AFTER INSERT ON member FOR EACH ROW
+begin
+
+	INSERT INTO membackup values (NEW.memberid , NEW.mfname, NEW.mlname);
+end /
+
+Delimiter ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
