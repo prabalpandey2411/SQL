@@ -1,0 +1,214 @@
+//procedure without any input/ouput parameters
+
+Delimiter /
+
+CREATE PROCEDURE getAllauthors()
+BEGIN
+	Select authorname from author ;
+END /
+
+Delimiter ;
+
+CALL getAllauthors;
+---------------------------------------------------------------------
+//procedure without any input/ouput parameters
+
+Delimiter @
+
+CREATE PROCEDURE allbooks()
+BEGIN
+	select * from book;
+END @
+
+CALL allbooks;
+--------------------------------------------------------------------
+//calling ohter procedures from one procedure 
+
+Delimiter //
+create procedure calltwoprocedures()
+begin
+	CALL getAllauthors;	
+	CALL allbooks;
+end //
+
+Delimiter ;
+-------------------------------------------------------------------------
+//procedure with ONE INPUT parameter
+
+Delimiter @@
+
+CREATE PROCEDURE getmemberinfo(IN mid varchar(10))
+BEGIN
+
+Select * from member where memberid = mid;
+
+END @@
+
+Delimiter ;
+
+---------------------------------------------------------------------
+//procedure with TWO INPUT parameter
+
+
+Delimiter #
+CREATE PROCEDURE getmeminfo(IN stus varchar(10) , IN gen varchar(10))
+begin
+
+select * from member where status = stus and sex = gen;
+
+end #
+
+Delimiter ;
+
+--------------------------------------------------------------------
+
+Delimiter @@
+
+CREATE PROCEDURE getmemberCount(IN sts varchar(10))
+BEGIN
+
+select count(status) from member group by status having status = sts;
+
+END @@
+
+Delimiter ;
+
+---------------------------------------------------------------------
+//procedure with ONE INPUT ONE OUTPUT parameters
+
+
+Delimiter @@
+
+CREATE PROCEDURE getmember(IN sts varchar(10), OUT cnt int(10))
+BEGIN
+
+select count(status)  from member group by status having status = sts  INTO cnt;
+
+END @@
+
+Delimiter ;
+
+call getmember('Active' , @mcount);
+Select @mcount;
+
+---------------------------------------------------------------------------------------------------------------------------------
+// Use of if else logic in procedure
+
+Delimiter /
+
+CREATE PROCEDURE chkprice (IN bid varchar(10), OUT cst int(10) , OUT msg varchar(70))
+BEGIN
+
+	declare bookcost int(20);
+
+	select cost from book where bookid = bid INTO bookcost;
+	
+	IF BOOKCOST >= 200
+		THEN SET msg = 'Eligible For discount';
+	ELSE SET msg = 'Not eligible for discount';
+	END IF;
+	set cst = bookcost;
+	
+END /
+Delimiter ;
+---------------------------------------------------------------------------------------------------------------------------------
+
+// Use of if else logic in procedure
+
+Delimiter /
+
+CREATE PROCEDURE calculateBookPrice (IN bid varchar(10), OUT Orignalcost int(10) ,OUT DicountedCost int(10),  OUT msg varchar(70))
+BEGIN
+
+	declare bookcost int(20);
+
+	select cost from book where bookid = bid INTO bookcost;
+	
+	IF BOOKCOST >= 200
+		THEN SET msg = 'Eligible For discount';
+		set DicountedCost = 0.9*bookcost;	
+	ELSE SET msg = 'Not eligible for discount';
+		set DicountedCost = bookcost;	
+	END IF;
+	set Orignalcost = bookcost;
+	
+END /
+Delimiter ;
+
+call calculateBookPrice('B002',@Orignalcost, @DicountedCost,@msg);
+ select @msg, @Orignalcost, @DicountedCost);
+--------------------------------------------------------------------------------------
+// procedure to use switch case
+
+Delimiter /
+CREATE PROCEDURE chkdojyear(IN mid varchar(10) , OUT mstatus varchar(50))
+Begin
+
+declare yrr int(10);
+select year(doj) from member where memberid = mid  INTO yrr;
+
+CASE
+	WHEN yrr = 2022 THEN SET mstatus = ' Current Year Member';
+
+	WHEN yrr = 2021 THEN SET mstatus = ' Last Year Member';
+
+	WHEN yrr < 2021 THEN SET mstatus = ' Old Member';
+	
+	ELSE
+	Select 'No Member present of such id';
+
+END CASE;
+
+End /
+Delimiter ;
+
+call chkdojyear('M007',@mstatus);
+select @mstatus;
+
+
+call chkdojyear('M005',@mstatus);
+select @mstatus;
+
+
+call chkdojyear('M115',@mstatus);
+select @mstatus;
+
+
+
+
+
+
+
+
+
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
